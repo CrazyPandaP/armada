@@ -15,6 +15,7 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
 - `patches/0010-msm-resource-cleanup.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/packages/linux/patches/7.0/0010-msm-resource-cleanup.patch
   upstream: unknown
+  notes: Armada initialises cstate before the num_mixers reset it adds; the ROCKNIX version writes through an uninitialised pointer.
 - `patches/0048-drm-msm-dsi-reparent-byte-pixel-src-to-xo-on-disable.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8750/patches/linux/0048-drm-msm-dsi-reparent-byte-pixel-src-to-xo-on-disable.patch
   upstream: unknown
@@ -22,6 +23,22 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
   source: armada
   upstream: local
   notes: Armada wrote this patch; it has not been submitted upstream.
+- `patches/0066-drm-msm-dpu-enable-inline-rotation.patch`
+  source: https://github.com/ROCKNIX/distribution/blob/60bb58c1db053255b700f3953b72d619ec5aa85d/projects/ROCKNIX/devices/SM8550/patches/linux/0066-drm-msm-dpu-enable-sm8550-inline-rotation.patch
+  upstream: unknown
+  notes: Armada merged the ROCKNIX SM8550, SM8650 and SM8750 patches into one for the combined kernel, with one shared feature mask and rotation config.
+- `patches/0067-drm-msm-dpu-enable-qseed-detail-enhancer.patch`
+  source: https://github.com/ROCKNIX/distribution/blob/60bb58c1db053255b700f3953b72d619ec5aa85d/projects/ROCKNIX/devices/SM8550/patches/linux/0067-drm-msm-dpu-enable-qseed-detail-enhancer.patch
+  upstream: unknown
+- `patches/0068-drm-msm-dpu-lutdma-dspp-igc-gamut.patch`
+  source: armada
+  upstream: local
+- `patches/0069-dt-bindings-display-msm-dpu-lutdma-reg.patch`
+  source: armada
+  upstream: local
+- `patches/0070-arm64-dts-qcom-dpu-lutdma-reg.patch`
+  source: armada
+  upstream: local
 - `patches/0016-rp5-smooth-brightness-adjustment.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8250/patches/linux/0016-rp5-smooth-brightness-adjustment.patch
   upstream: unknown
