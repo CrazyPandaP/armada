@@ -125,6 +125,7 @@ mod tests {
     fn packaged_profiles_cover_current_devices() {
         let catalog: ProfileCatalog = parse_catalog(include_str!("../profiles.json")).unwrap();
         for model in [
+            "AYN Odin 2",
             "AYN Odin 2 Portal",
             "AYN Thor",
             "AYN Thor Lite",

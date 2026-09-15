@@ -29,6 +29,20 @@
       }
     },
     {
+      "models": [
+        "AYN Odin 2"
+      ],
+      "backend": {
+        "type": "multicolor",
+        "targets": [
+          "left-joystick",
+          "left-side",
+          "right-joystick",
+          "right-side"
+        ]
+      }
+    },
+    {
       "models": ["KONKR Pocket FIT Elite"],
       "backend": {
         "type": "multicolor",
