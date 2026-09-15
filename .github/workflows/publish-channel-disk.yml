@@ -1,11 +1,11 @@
 ---
-name: Republish channel disk image
+name: Publish disk image
 
 on:
   workflow_dispatch:
     inputs:
       channel:
-        description: "Disk channel to republish"
+        description: "Channel to publish downloads for"
         type: choice
         options: [preview, staging]
         default: preview
@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   resolve:
-    name: Resolve channel container
+    name: Select source container
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04-arm
     outputs:
@@ -24,7 +24,7 @@ jobs:
       image_digest: ${{ steps.source.outputs.image_digest }}
       source_ref: ${{ steps.source.outputs.source_ref }}
     steps:
-      - name: Resolve channel source
+      - name: Read container digest and source commit
         id: source
         env:
           CHANNEL: ${{ inputs.channel }}
@@ -48,7 +48,7 @@ jobs:
           echo "source_ref=${revision}" >> "${GITHUB_OUTPUT}"
 
   publish:
-    name: Publish channel image
+    name: Disk image
     needs: resolve
     uses: ./.github/workflows/build-disk.yml
     with:

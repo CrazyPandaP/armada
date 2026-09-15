@@ -1,5 +1,5 @@
 ---
-name: Build container image
+name: Build images
 on:
   pull_request:
     branches:
@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   build_push:
-    name: Build and push image
+    name: Container image
     runs-on: ubuntu-24.04-arm
     outputs:
       channel: ${{ steps.channel.outputs.channel }}
@@ -73,7 +73,7 @@ jobs:
           echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
           echo "channel=${channel}" >> "${GITHUB_OUTPUT}"
 
-      - name: Ensure container tools
+      - name: Install container tools
         run: |
           set -euxo pipefail
           # ubuntu-24.04 dropped these from the runner image; the build action,
@@ -84,7 +84,7 @@ jobs:
           done
           [ -z "$need" ] || { sudo apt-get update && sudo apt-get install -y $need; }
 
-      - name: Require signing key before publishing a channel
+      - name: Check signing key
         if: github.event_name != 'pull_request'
         run: |
           if [ -z "${{ secrets.SIGNING_SECRET }}" ]; then
@@ -92,12 +92,12 @@ jobs:
             exit 1
           fi
 
-      - name: Checkout
+      - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.sha }}
 
-      - name: Check build recipes
+      - name: Install just
         uses: ublue-os/just-action@30ab4659369934b65b655bf8d2fa4ddd6547d384 # v3
 
       - name: Get image version
@@ -107,7 +107,7 @@ jobs:
           echo "version=$(TZ=America/New_York date +%Y%m%d).$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Image Metadata
+      - name: Generate image metadata
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         id: metadata
         with:
@@ -156,7 +156,7 @@ jobs:
           buildah info --storage-opt=overlay.mount_program= |
             jq -e '.store.GraphStatus["Native Overlay Diff"] == "true"'
 
-      - name: Build Image
+      - name: Build container image
         id: build_image
         uses: redhat-actions/buildah-build@5d8479758cc72ed82df28daba521d27e20ff8c8a # v3.0.0
         with:
@@ -224,7 +224,7 @@ jobs:
             "${CHUNKAH_MANIFEST_FILE}"
           echo "ref=${CHUNKED_REF}" >> "${GITHUB_OUTPUT}"
 
-      - name: Push to GHCR
+      - name: Push container to GHCR
         id: push
         if: github.event_name != 'pull_request'
         run: |
@@ -312,7 +312,7 @@ jobs:
           HAVE_SIGNING_SECRET: ${{ secrets.SIGNING_SECRET != '' }}
 
   publish_disk:
-    name: Publish channel disk image
+    name: Disk image
     needs: build_push
     if: >-
       github.event_name != 'pull_request' &&

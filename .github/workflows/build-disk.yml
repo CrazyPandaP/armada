@@ -47,7 +47,7 @@ env:
 
 jobs:
   build:
-    name: Build disk image
+    name: Build and upload
     runs-on: ubuntu-24.04-arm
     concurrency:
       group: ${{ inputs.publish_r2 && format('{0}-disk', inputs.channel) || format('build-disk-{0}', github.ref || github.run_id) }}
@@ -73,12 +73,12 @@ jobs:
             fi
           done
 
-      - name: Maximize build space
+      - name: Free build space
         uses: ublue-os/remove-unwanted-software@cc0becac701cf642c8f0a6613bbdaf5dc36b259e # v9
         with:
           remove-codeql: true
 
-      - name: Checkout
+      - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.source_ref || github.sha }}
@@ -91,10 +91,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends containernetworking-plugins
 
-      - name: Check build recipes
+      - name: Install just
         uses: ublue-os/just-action@30ab4659369934b65b655bf8d2fa4ddd6547d384 # v3
 
-      - name: Log in to ghcr.io
+      - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Resolve container tag
@@ -114,7 +114,7 @@ jobs:
           fi
           echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
 
-      - name: Build Armada image
+      - name: Build disk image
         env:
           ARMADA_IMAGE_DIGEST: ${{ inputs.image_digest }}
         run: |
@@ -166,7 +166,7 @@ jobs:
           (cd output && sha256sum "${filename}" > "${filename}.sha256")
           echo "image=${image}" >> "${GITHUB_OUTPUT}"
 
-      - name: Upload disk image
+      - name: Upload disk image to GitHub artifacts
         if: ${{ !inputs.publish_r2 }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
