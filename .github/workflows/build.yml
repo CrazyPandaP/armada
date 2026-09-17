@@ -1,10 +1,6 @@
 ---
 name: Build images
 on:
-  pull_request:
-    branches:
-      - main
-      - staging
   push:
     branches:
       - main
@@ -58,10 +54,8 @@ jobs:
         id: channel
         env:
           BUILD_REF: ${{ github.ref }}
-          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
-          [ "${EVENT_NAME}" != pull_request ] || exit 0
           if [[ "${BUILD_REF}" != refs/heads/* ]]; then
             echo "::error::Select a branch to build."
             exit 1
@@ -94,7 +88,6 @@ jobs:
           [ -z "$need" ] || { sudo apt-get update && sudo apt-get install -y $need; }
 
       - name: Check signing key
-        if: github.event_name != 'pull_request'
         run: |
           if [ -z "${{ secrets.SIGNING_SECRET }}" ]; then
             echo "::error::SIGNING_SECRET is not set — refusing to publish an unsigned image (devices verify ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }})."
@@ -121,9 +114,7 @@ jobs:
         id: metadata
         with:
           tags: |
-            type=raw,value=${{ steps.channel.outputs.tag }},enable=${{ github.event_name != 'pull_request' }}
-            type=sha,enable=${{ github.event_name == 'pull_request' }}
-            type=ref,event=pr
+            type=raw,value=${{ steps.channel.outputs.tag }}
           labels: |
             org.opencontainers.image.revision=${{ steps.version.outputs.revision }}
             org.opencontainers.image.created=${{ steps.version.outputs.created }}
@@ -252,7 +243,6 @@ jobs:
 
       - name: Push container to GHCR
         id: push
-        if: github.event_name != 'pull_request'
         run: |
           set -euxo pipefail
           echo "${{ secrets.GITHUB_TOKEN }}" | skopeo login ghcr.io -u "${{ github.actor }}" --password-stdin
@@ -268,14 +258,14 @@ jobs:
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
-        if: github.event_name != 'pull_request' && env.HAVE_SIGNING_SECRET == 'true'
+        if: env.HAVE_SIGNING_SECRET == 'true'
         env:
           HAVE_SIGNING_SECRET: ${{ secrets.SIGNING_SECRET != '' }}
         with:
           cosign-release: 'v2.6.3'
 
       - name: Sign container image
-        if: github.event_name != 'pull_request' && env.HAVE_SIGNING_SECRET == 'true'
+        if: env.HAVE_SIGNING_SECRET == 'true'
         run: |
           set -euo pipefail
           IMAGE_FULL="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
@@ -312,7 +302,7 @@ jobs:
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
 
       - name: Publish channel tags
-        if: github.event_name != 'pull_request' && env.HAVE_SIGNING_SECRET == 'true'
+        if: env.HAVE_SIGNING_SECRET == 'true'
         run: |
           set -euo pipefail
           IMAGE_FULL="${IMAGE_REGISTRY}/${IMAGE_NAME}"
@@ -341,7 +331,6 @@ jobs:
     name: Disk image
     needs: build_push
     if: >-
-      github.event_name != 'pull_request' &&
       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging') &&
       needs.build_push.outputs.channel != ''
     permissions:

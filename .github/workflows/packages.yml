@@ -136,32 +136,23 @@ jobs:
             ccache-${{ matrix.package }}-${{ runner.arch }}-${{ hashFiles('packages/toolchain.env') }}-
 
       - name: Log in to GHCR
-        id: login
-        # A fork PR gets a read-only token, so it consults the cache without
-        # writing to it.
-        continue-on-error: true
         run: echo "${{ secrets.GITHUB_TOKEN }}" | buildah login -u "${{ github.actor }}" --password-stdin ghcr.io
 
       - name: Build and publish
         env:
           PACKAGE: ${{ matrix.package }}
           HASH: ${{ matrix.hash }}
-          CAN_WRITE_CACHE: ${{ steps.login.outcome == 'success' && github.event.pull_request.head.repo.fork != true }}
         run: |
           set -euxo pipefail
           owner="${{ github.repository_owner }}"
           REF="ghcr.io/${owner,,}/armada/pkg/${PACKAGE}:${HASH}"
 
-          CACHE_ARGS=(--cache-from "${CACHE_REPO}")
-          if [ "${CAN_WRITE_CACHE}" = true ]; then
-            CACHE_ARGS+=(--cache-to "${CACHE_REPO}")
-          fi
-
           buildah build \
             -f packages/Containerfile \
             --target "out-${PACKAGE}" \
             --layers \
-            "${CACHE_ARGS[@]}" \
+            --cache-from "${CACHE_REPO}" \
+            --cache-to "${CACHE_REPO}" \
             --build-arg "BUILDER_IMAGE=${BUILDER_IMAGE}" \
             --build-arg "GUEST_BUILDER_IMAGE=${GUEST_BUILDER_IMAGE}" \
             -t "${REF}" \
