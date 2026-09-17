@@ -98,7 +98,7 @@ jobs:
         run: |
           set -euxo pipefail
           need=""
-          for t in buildah; do
+          for t in buildah skopeo; do
             command -v "$t" >/dev/null || need="$need $t"
           done
           # Runner crun mismatches podman ("crun: unknown version specified").
@@ -167,7 +167,13 @@ jobs:
             -t "${REF}" \
             packages/
 
-          buildah push "${REF}"
+          # Another run can publish this hash while we build. Identical inputs,
+          # so skipping is safe, but warn in case the hash is missing an input.
+          if skopeo inspect --raw "docker://${REF}" >/dev/null 2>&1; then
+            echo "::warning::${REF} already published, skipping push"
+          else
+            buildah push "${REF}"
+          fi
           {
             echo "### \`${PACKAGE}\` published"
             echo '```'
