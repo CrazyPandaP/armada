@@ -98,7 +98,7 @@ COPY --from=pkg-mangohud /work/out/ /rpms/
 FROM builder-base AS pkg-mesa
 COPY mesa/ /work/
 WORKDIR /work
-RUN --mount=type=cache,target=/ccache ./build.sh && /src/scrub-scratch.sh
+RUN --mount=type=cache,id=armada-ccache-mesa,target=/ccache ./build.sh && /src/scrub-scratch.sh
 
 FROM scratch AS out-mesa
 COPY --from=pkg-mesa /work/out/ /rpms/
@@ -158,7 +158,7 @@ COPY --from=pkg-fex /work/out/ /rpms/
 FROM builder-base AS pkg-kernel
 COPY kernel/ /work/
 WORKDIR /work
-RUN --mount=type=cache,target=/ccache ./build.sh && /src/scrub-scratch.sh
+RUN --mount=type=cache,id=armada-ccache-kernel,target=/ccache ./build.sh && /src/scrub-scratch.sh
 
 FROM scratch AS out-kernel
 COPY --from=pkg-kernel /work/out/ /kernel/

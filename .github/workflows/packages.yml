@@ -8,9 +8,9 @@ name: Packages
 on:
   workflow_call:
     outputs:
-      artifact_pattern:
-        description: "download-artifact pattern covering every consumed package"
-        value: packages-*
+      build_args:
+        description: "PKG_REF=<image> lines, one per package, for --build-arg-file"
+        value: ${{ jobs.prepare.outputs.build_args }}
   workflow_dispatch:
 
 permissions:
@@ -18,34 +18,78 @@ permissions:
   packages: write
 
 jobs:
+  prepare:
+    name: Resolve packages
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: read
+    outputs:
+      matrix: ${{ steps.resolve.outputs.matrix }}
+      build_args: ${{ steps.resolve.outputs.build_args }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install skopeo
+        run: command -v skopeo >/dev/null || { sudo apt-get update && sudo apt-get install -y skopeo; }
+
+      - name: Resolve what needs building
+        id: resolve
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          owner="${{ github.repository_owner }}"
+          repo="ghcr.io/${owner,,}/armada/pkg"
+          echo "${GH_TOKEN}" | skopeo login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+          matrix='[]'
+          args=""
+          # The package set is the directories themselves, so it cannot drift
+          # from the tree. Only the two cross-compiled ones need a non-arm runner.
+          for dir in packages/*/; do
+            pkg="$(basename "${dir}")"
+            [ -f "${dir}/build.sh" ] || continue
+            hash="$(packages/package-hash.sh "${pkg}")"
+            ref="${repo}/${pkg}:${hash}"
+
+            case "${pkg}" in
+              mesa-android|mesa-x86) runner=ubuntu-24.04 ;;
+              *)                     runner=ubuntu-24.04-arm ;;
+            esac
+
+            if skopeo inspect --raw "docker://${ref}" >/dev/null 2>&1; then
+              echo "::notice::${pkg} already built (${hash})"
+            else
+              echo "::notice::${pkg} needs building (${hash})"
+              matrix="$(jq -c --arg p "${pkg}" --arg r "${runner}" --arg h "${hash}" \
+                '. + [{package:$p, runner:$r, hash:$h}]' <<<"${matrix}")"
+            fi
+
+            # The image build needs a ref for every package, built now or not.
+            var="$(printf '%s' "${pkg}" | tr '[:lower:]-' '[:upper:]_')_REF"
+            args="${args}${var}=${ref}"$'\n'
+          done
+
+          echo "matrix=${matrix}" >> "${GITHUB_OUTPUT}"
+          {
+            echo "build_args<<BUILD_ARGS_EOF"
+            printf '%s' "${args}"
+            echo "BUILD_ARGS_EOF"
+          } >> "${GITHUB_OUTPUT}"
+          echo "### Packages to build: $(jq length <<<"${matrix}")" >> "${GITHUB_STEP_SUMMARY}"
+          jq -r '.[] | "- \(.package)"' <<<"${matrix}" >> "${GITHUB_STEP_SUMMARY}"
+
   build:
     name: ${{ matrix.package }}
+    needs: prepare
+    if: needs.prepare.outputs.matrix != '[]'
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { package: armada-rgb, runner: ubuntu-24.04-arm }
-          - { package: armada-splash, runner: ubuntu-24.04-arm }
-          - { package: extest, runner: ubuntu-24.04-arm }
-          - { package: fex, runner: ubuntu-24.04-arm }
-          - { package: gamescope, runner: ubuntu-24.04-arm }
-          - { package: gamescope-session, runner: ubuntu-24.04-arm }
-          - { package: gamescope-session-steam, runner: ubuntu-24.04-arm }
-          - { package: inputplumber, runner: ubuntu-24.04-arm }
-          - { package: jupiter-hw-support, runner: ubuntu-24.04-arm }
-          - { package: kernel, runner: ubuntu-24.04-arm }
-          - { package: kwin, runner: ubuntu-24.04-arm }
-          - { package: mangohud, runner: ubuntu-24.04-arm }
-          - { package: mesa, runner: ubuntu-24.04-arm }
-          - { package: networkmanager, runner: ubuntu-24.04-arm }
-          - { package: plasma-mobile, runner: ubuntu-24.04-arm }
-          - { package: powerdevil, runner: ubuntu-24.04-arm }
-          - { package: steam-bootstrap, runner: ubuntu-24.04-arm }
-          - { package: umtp-responder, runner: ubuntu-24.04-arm }
-          # x86_64 runner packages
-          - { package: mesa-android, runner: ubuntu-24.04 }
-          - { package: mesa-x86, runner: ubuntu-24.04 }
+        include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -75,6 +119,22 @@ jobs:
           owner="${{ github.repository_owner }}"
           echo "CACHE_REPO=ghcr.io/${owner,,}/armada/buildcache/${{ matrix.package }}" >> "${GITHUB_ENV}"
 
+      - name: Locate buildah cache mounts
+        id: cachedir
+        run: echo "dir=/var/tmp/buildah-cache-$(id -u)" >> "${GITHUB_OUTPUT}"
+
+      - name: ccache
+        # Buildah's cache mounts live outside the layer store, so they start
+        # empty on a fresh runner unless restored here.
+        if: matrix.package == 'kernel' || matrix.package == 'mesa'
+        uses: actions/cache@640a1c2554105b57832a23eea0b4672fc7a790d5 # v4.2.3
+        with:
+          path: ${{ steps.cachedir.outputs.dir }}
+          # hash the pinned toolchain into the key so a bump cannot serve stale objects
+          key: ccache-${{ matrix.package }}-${{ runner.arch }}-${{ hashFiles('packages/toolchain.env') }}-${{ hashFiles(format('packages/{0}/**', matrix.package)) }}
+          restore-keys: |
+            ccache-${{ matrix.package }}-${{ runner.arch }}-${{ hashFiles('packages/toolchain.env') }}-
+
       - name: Log in to GHCR
         id: login
         # A fork PR gets a read-only token, so it consults the cache without
@@ -82,16 +142,21 @@ jobs:
         continue-on-error: true
         run: echo "${{ secrets.GITHUB_TOKEN }}" | buildah login -u "${{ github.actor }}" --password-stdin ghcr.io
 
-      - name: Build package
+      - name: Build and publish
         env:
           PACKAGE: ${{ matrix.package }}
+          HASH: ${{ matrix.hash }}
           CAN_WRITE_CACHE: ${{ steps.login.outcome == 'success' && github.event.pull_request.head.repo.fork != true }}
         run: |
           set -euxo pipefail
+          owner="${{ github.repository_owner }}"
+          REF="ghcr.io/${owner,,}/armada/pkg/${PACKAGE}:${HASH}"
+
           CACHE_ARGS=(--cache-from "${CACHE_REPO}")
           if [ "${CAN_WRITE_CACHE}" = true ]; then
             CACHE_ARGS+=(--cache-to "${CACHE_REPO}")
           fi
+
           buildah build \
             -f packages/Containerfile \
             --target "out-${PACKAGE}" \
@@ -99,26 +164,13 @@ jobs:
             "${CACHE_ARGS[@]}" \
             --build-arg "BUILDER_IMAGE=${BUILDER_IMAGE}" \
             --build-arg "GUEST_BUILDER_IMAGE=${GUEST_BUILDER_IMAGE}" \
-            --output "type=local,dest=staged" \
+            -t "${REF}" \
             packages/
-          echo "Staged for ${PACKAGE}:" && find staged -type f
 
-      - name: Pack artifacts
-        env:
-          PACKAGE: ${{ matrix.package }}
-        run: |
-          set -euo pipefail
-          # tar rather than loose files: upload-artifact drops permission bits,
-          # and one file uploads far faster than a directory of small RPMs.
-          tar -cf "${PACKAGE}.tar" -C staged .
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: packages-${{ matrix.package }}
-          path: ${{ matrix.package }}.tar
-          # Payloads are already compressed — RPMs, squashfs, zstd archives.
-          # Re-zipping steam-bootstrap's 1.7GB costs ~39s to save 0.18%.
-          compression-level: 0
-          retention-days: 1
-          if-no-files-found: error
+          buildah push "${REF}"
+          {
+            echo "### \`${PACKAGE}\` published"
+            echo '```'
+            echo "${REF}"
+            echo '```'
+          } >> "${GITHUB_STEP_SUMMARY}"

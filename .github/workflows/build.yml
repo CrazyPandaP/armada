@@ -25,8 +25,17 @@ concurrency:
   queue: max
 
 jobs:
+  packages:
+    name: Packages
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/packages.yml
+    secrets: inherit
+
   build_push:
     name: Container image
+    needs: packages
     runs-on: ubuntu-24.04-arm
     outputs:
       channel: ${{ steps.channel.outputs.channel }}
@@ -150,6 +159,22 @@ jobs:
           echo "base_image=${base_image}" >> "${GITHUB_OUTPUT}"
           echo "config=${config}" >> "${GITHUB_OUTPUT}"
 
+      - name: Resolve package refs
+        env:
+          BUILD_ARGS: ${{ needs.packages.outputs.build_args }}
+        run: |
+          set -euo pipefail
+          # One <PKG>_REF=<image> line per package, from the Packages workflow.
+          # Unchanged packages resolve to an image built by an earlier run.
+          printf '%s' "${BUILD_ARGS}" > "${RUNNER_TEMP}/package-refs.env"
+          expected=$(grep -c '^ARG [A-Z0-9_]*_REF$' Containerfile)
+          got=$(grep -c '_REF=' "${RUNNER_TEMP}/package-refs.env")
+          if [ "${expected}" -ne "${got}" ]; then
+            echo "::error::Containerfile wants ${expected} package refs, resolver gave ${got}"
+            exit 1
+          fi
+          echo "Resolved ${got} package refs:" && cat "${RUNNER_TEMP}/package-refs.env"
+
       - name: Require native OverlayFS
         run: |
           set -euxo pipefail
@@ -171,6 +196,7 @@ jobs:
             CHUNKAH_CONFIG_STR=${{ steps.chunkah_config.outputs.config }}
           # armada-rootfs is consumed through RUN --mount, so retain otherwise-unused stages.
           extra-args: |
+            --build-arg-file=${{ runner.temp }}/package-refs.env
             --skip-unused-stages=false
             --target=chunkah
             --volume=${{ runner.temp }}:/run/src

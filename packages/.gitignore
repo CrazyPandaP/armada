@@ -15,13 +15,7 @@ fex-sysroot-macros.inc
 *.img
 *.so
 
-# Local env-specific recipes (mac-* remote build flow)
-Justfile.local
-
-# Staging dir for the carrier image build
-ctx/
-
-# ccache (local builds; CI persists it separately)
+# ccache for build-local.sh runs
 .ccache/
 
 # Editor noise
