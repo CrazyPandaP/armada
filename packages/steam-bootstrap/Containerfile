@@ -1,3 +1,4 @@
 ARG BUILDER_IMAGE
 FROM ${BUILDER_IMAGE}
-RUN dnf -y install python3 curl unzip file tar xz zstd xorg-x11-server-Xvfb gtk2 libatomic && dnf clean all
+COPY install-builder-deps.sh /tmp/
+RUN /tmp/install-builder-deps.sh

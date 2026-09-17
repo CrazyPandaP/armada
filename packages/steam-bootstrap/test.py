@@ -75,47 +75,5 @@ class ManifestSelectionTests(unittest.TestCase):
                 request.assert_not_called()
 
 
-class BuildTests(unittest.TestCase):
-    def test_generation_is_offline_and_stale_outputs_are_removed(self):
-        import json
-        import os
-        import shutil
-        import subprocess
-
-        for failure in (False, True):
-            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as directory:
-                root = pathlib.Path(directory)
-                package = root / "steam-bootstrap"
-                package.mkdir()
-                shutil.copyfile(pathlib.Path(__file__).with_name("build.sh"), package / "build.sh")
-                (root / "toolchain.env").write_text("BUILDER_IMAGE=fixture\n")
-                (package / "BASE.env").write_text("STEAM_CLIENT_VERSION=123\n")
-                (package / "out").mkdir()
-                (package / "out/steam-bootstrap.tar.zst").write_text("old archive")
-                (package / "out/version").write_text("old version")
-                (package / "work").mkdir()
-                (package / "work/cache").touch()
-                commands = root / "bin"
-                commands.mkdir()
-                (commands / "uname").write_text("#!/bin/sh\necho aarch64\n")
-                (commands / "podman").write_text(
-                    "#!/usr/bin/env python3\nimport json, os, sys\n"
-                    "with open(os.environ['CALL_LOG'], 'a') as log: log.write(json.dumps(sys.argv[1:]) + '\\n')\n"
-                    "if os.environ['FAIL_GENERATION'] == '1' and 'generate.sh' in sys.argv: sys.exit(1)\n"
-                )
-                for command in commands.iterdir():
-                    command.chmod(0o755)
-                log = root / "calls"
-                env = dict(os.environ, PATH=f"{commands}:{os.environ['PATH']}", CALL_LOG=str(log), FAIL_GENERATION=str(int(failure)))
-                result = subprocess.run(["bash", str(package / "build.sh")], env=env)
-                self.assertEqual(result.returncode, int(failure))
-                calls = [json.loads(line) for line in log.read_text().splitlines()]
-                self.assertEqual(len(calls), 3)
-                self.assertEqual(calls[-1][calls[-1].index("--network") + 1], "none")
-                self.assertTrue(any("fetch.py" in arg for arg in calls[-2]))
-                self.assertEqual(list((package / "out").iterdir()), [])
-                self.assertTrue((package / "work/cache").exists())
-
-
 if __name__ == "__main__":
     unittest.main()

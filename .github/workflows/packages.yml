@@ -1,0 +1,124 @@
+---
+name: Packages
+
+# Builds each package as a Containerfile stage and hands the result to the image
+# build. One job per package so they build in parallel. Folding them into the
+# image build would serialise 20 builds onto one machine.
+
+on:
+  workflow_call:
+    outputs:
+      artifact_pattern:
+        description: "download-artifact pattern covering every consumed package"
+        value: packages-*
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: ${{ matrix.package }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { package: armada-rgb, runner: ubuntu-24.04-arm }
+          - { package: armada-splash, runner: ubuntu-24.04-arm }
+          - { package: extest, runner: ubuntu-24.04-arm }
+          - { package: fex, runner: ubuntu-24.04-arm }
+          - { package: gamescope, runner: ubuntu-24.04-arm }
+          - { package: gamescope-session, runner: ubuntu-24.04-arm }
+          - { package: gamescope-session-steam, runner: ubuntu-24.04-arm }
+          - { package: inputplumber, runner: ubuntu-24.04-arm }
+          - { package: jupiter-hw-support, runner: ubuntu-24.04-arm }
+          - { package: kernel, runner: ubuntu-24.04-arm }
+          - { package: kwin, runner: ubuntu-24.04-arm }
+          - { package: mangohud, runner: ubuntu-24.04-arm }
+          - { package: mesa, runner: ubuntu-24.04-arm }
+          - { package: networkmanager, runner: ubuntu-24.04-arm }
+          - { package: plasma-mobile, runner: ubuntu-24.04-arm }
+          - { package: powerdevil, runner: ubuntu-24.04-arm }
+          - { package: steam-bootstrap, runner: ubuntu-24.04-arm }
+          - { package: umtp-responder, runner: ubuntu-24.04-arm }
+          # x86_64 runner packages
+          - { package: mesa-android, runner: ubuntu-24.04 }
+          - { package: mesa-x86, runner: ubuntu-24.04 }
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install container tools
+        run: |
+          set -euxo pipefail
+          need=""
+          for t in buildah; do
+            command -v "$t" >/dev/null || need="$need $t"
+          done
+          # Runner crun mismatches podman ("crun: unknown version specified").
+          command -v runc >/dev/null || need="$need runc"
+          [ -z "$need" ] || { sudo apt-get update && sudo apt-get install -y $need; }
+          mkdir -p ~/.config/containers
+          printf '[engine]\nruntime = "runc"\n' > ~/.config/containers/containers.conf
+
+      - name: Resolve builder images
+        run: |
+          set -euo pipefail
+          # Only the FROM images need to cross the build-arg boundary. build.sh
+          # sources toolchain.env itself from /src inside the stage.
+          source packages/toolchain.env
+          source packages/mesa-x86/BASE.env
+          echo "BUILDER_IMAGE=${BUILDER_IMAGE}" >> "${GITHUB_ENV}"
+          echo "GUEST_BUILDER_IMAGE=${GUEST_BUILDER_IMAGE}" >> "${GITHUB_ENV}"
+          owner="${{ github.repository_owner }}"
+          echo "CACHE_REPO=ghcr.io/${owner,,}/armada/buildcache/${{ matrix.package }}" >> "${GITHUB_ENV}"
+
+      - name: Log in to GHCR
+        id: login
+        # A fork PR gets a read-only token, so it consults the cache without
+        # writing to it.
+        continue-on-error: true
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | buildah login -u "${{ github.actor }}" --password-stdin ghcr.io
+
+      - name: Build package
+        env:
+          PACKAGE: ${{ matrix.package }}
+          CAN_WRITE_CACHE: ${{ steps.login.outcome == 'success' && github.event.pull_request.head.repo.fork != true }}
+        run: |
+          set -euxo pipefail
+          CACHE_ARGS=(--cache-from "${CACHE_REPO}")
+          if [ "${CAN_WRITE_CACHE}" = true ]; then
+            CACHE_ARGS+=(--cache-to "${CACHE_REPO}")
+          fi
+          buildah build \
+            -f packages/Containerfile \
+            --target "out-${PACKAGE}" \
+            --layers \
+            "${CACHE_ARGS[@]}" \
+            --build-arg "BUILDER_IMAGE=${BUILDER_IMAGE}" \
+            --build-arg "GUEST_BUILDER_IMAGE=${GUEST_BUILDER_IMAGE}" \
+            --output "type=local,dest=staged" \
+            packages/
+          echo "Staged for ${PACKAGE}:" && find staged -type f
+
+      - name: Pack artifacts
+        env:
+          PACKAGE: ${{ matrix.package }}
+        run: |
+          set -euo pipefail
+          # tar rather than loose files: upload-artifact drops permission bits,
+          # and one file uploads far faster than a directory of small RPMs.
+          tar -cf "${PACKAGE}.tar" -C staged .
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: packages-${{ matrix.package }}
+          path: ${{ matrix.package }}.tar
+          # Payloads are already compressed — RPMs, squashfs, zstd archives.
+          # Re-zipping steam-bootstrap's 1.7GB costs ~39s to save 0.18%.
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
