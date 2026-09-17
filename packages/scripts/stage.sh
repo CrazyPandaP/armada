@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Stage a package's build outputs into ctx/ in the layout oci/Containerfile
+# copies into the carrier image. Single source for both the Justfile `image`
+# recipe and CI. Usage: stage.sh <package>
+set -euo pipefail
+cd "$(dirname "$0")/.."
+pkg="${1:?usage: stage.sh <package>}"
+
+rm -rf ctx && mkdir -p ctx
+case "${pkg}" in
+    steam-bootstrap) mkdir -p ctx/steam-bootstrap && cp steam-bootstrap/out/* ctx/steam-bootstrap/ ;;
+    extest)       cp extest/out/libextest.so ctx/ ;;
+    lsfg-vk)      cp lsfg-vk/out/liblsfg-vk.so ctx/ ;;
+    mesa-android) mkdir -p ctx/waydroid && cp -r mesa-android/out/vendor ctx/waydroid/ ;;
+    mesa-x86)     cp mesa-x86/out/ArmadaMesa.sqsh ctx/ ;;
+    kernel)       mkdir -p ctx/kernel && cp kernel/out/armada-kernel-*.tar.zst kernel/out/armada-kernel-*.tar.zst.sha256 ctx/kernel/ ;;
+    armada-splash|armada-rgb|fex|mesa|mangohud|gamescope|gamescope-session|gamescope-session-steam|kwin|plasma-mobile|powerdevil|inputplumber|networkmanager|jupiter-hw-support|umtp-responder) mkdir -p ctx/rpms && cp "${pkg}"/out/*.rpm ctx/rpms/ ;;
+    *) echo "unknown package: ${pkg}" >&2; exit 1 ;;
+esac
