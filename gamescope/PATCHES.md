@@ -44,3 +44,5 @@ to a commit, or `armada` if it's original; a URL source with no `notes` is verba
   source: armada
 - `patches/0020-color-p3-red-is-wide-gamut.patch`
   source: armada
+- `patches/0021-libliftoff-fix-multiple-primary-plane-stacking.patch`
+  source: armada
