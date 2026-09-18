@@ -162,24 +162,24 @@ export function FanCurveEditor({
 
   return (
     <>
-      <PanelSection title={t("EDIT CURVE")}>
+      <PanelSection title={t("fanCurve.edit")}>
         {names.length ? (
           <PseudoDropdown
-            label={t("Curve")}
+            label={t("fanCurve.curve")}
             value={curveName}
             options={names.map((name) => ({ data: name, label: translateLabel(state.fanCurves[name]?.label || titleCase(name)) }))}
             onChange={onSelectedChange}
           />
         ) : (
           <PanelSectionRow>
-            <Field label={t("No fan curves found")} />
+            <Field label={t("fanCurve.noneFound")} />
           </PanelSectionRow>
         )}
         {curveName ? (
           <div className="afc-field-note afc-used-by-note">
             {usedBy.length
-              ? t("Used by: {profiles}", { profiles: usedBy.map((profile) => translateLabel(profile.label)).join(", ") })
-              : t("Not assigned to any profile")}
+              ? t("fanCurve.usedBy", { profiles: usedBy.map((profile) => translateLabel(profile.label)).join(", ") })
+              : t("fanCurve.unassigned")}
           </div>
         ) : null}
       </PanelSection>
@@ -197,27 +197,27 @@ export function FanCurveEditor({
           onFanStopTempChange={setFanStopTemp}
         />
       ) : null}
-      <PanelSection title={t("FAN RESPONSIVENESS")}>
+      <PanelSection title={t("fanCurve.responsiveness")}>
         <SliderEdit
-          label={t("Ramp Up")}
+          label={t("fanCurve.rampUp")}
           value={state.fanSettings.ramp_up}
           min={RAMP_MIN}
           max={RAMP_MAX}
           step={1}
           onChange={(v) => setFanSetting("ramp_up", v)}
         />
-        <div className="afc-field-note">{t("How fast the fan speeds up per ~3-second tick as the target rises.")}</div>
+        <div className="afc-field-note">{t("fanCurve.rampUpDescription")}</div>
         <SliderEdit
-          label={t("Ramp Down")}
+          label={t("fanCurve.rampDown")}
           value={state.fanSettings.ramp_down}
           min={RAMP_MIN}
           max={RAMP_MAX}
           step={1}
           onChange={(v) => setFanSetting("ramp_down", v)}
         />
-        <div className="afc-field-note">{t("How fast the fan slows down per ~3-second tick once the target drops.")}</div>
+        <div className="afc-field-note">{t("fanCurve.rampDownDescription")}</div>
         <SliderEdit
-          label={t("Temperature Smoothing (%)")}
+          label={t("fanCurve.temperatureSmoothing")}
           value={Math.round(state.fanSettings.smoothing * 100)}
           min={SMOOTHING_MIN}
           max={SMOOTHING_MAX}
@@ -225,10 +225,10 @@ export function FanCurveEditor({
           onChange={(v) => setFanSetting("smoothing", Number((v / 100).toFixed(2)))}
         />
         <div className="afc-field-note">
-          {t("Evens out the temperature reading itself before it reaches the curve, so brief spikes don't yank the target around.")}
+          {t("fanCurve.temperatureSmoothingDescription")}
         </div>
         <SliderEdit
-          label={t("Minimum Fan Speed (%)")}
+          label={t("fanCurve.minimumSpeed")}
           value={pwmToPercent(state.fanSettings.min_pwm)}
           min={MIN_FAN_SPEED}
           max={MAX_FAN_SPEED}
@@ -236,20 +236,20 @@ export function FanCurveEditor({
           onChange={(v) => setFanSetting("min_pwm", percentToPwm(v))}
           disabled={anyFanStop}
         />
-        <div className="afc-field-note">{t("The lowest speed Armada allows. Fan Stop forces it to 0%.")}</div>
+        <div className="afc-field-note">{t("fanCurve.minimumSpeedDescription")}</div>
       </PanelSection>
-      <PanelSection title={t("MANAGE CURVES")}>
+      <PanelSection title={t("fanCurve.manage")}>
         <PanelSectionRow>
           <div className="afc-control-inset">
             <ButtonItem layout="below" onClick={onOpenCreateCurve} disabled={!onOpenCreateCurve}>
-              {t("Create Curve")}
+              {t("fanCurve.create")}
             </ButtonItem>
           </div>
         </PanelSectionRow>
         {deletableNames.length ? (
           <>
             <PseudoDropdown
-              label={t("Curve To Delete")}
+              label={t("fanCurve.curveToDelete")}
               value={deleteTargetName}
               options={deletableNames.map((name) => ({
                 data: name,
@@ -263,14 +263,14 @@ export function FanCurveEditor({
             <PanelSectionRow>
               <div className="afc-control-inset">
                 <ButtonItem layout="below" onClick={handleDeleteClick} disabled={!deleteTargetName}>
-                  {confirmDelete ? t("Tap Again To Confirm Delete") : t("Delete Curve")}
+                  {confirmDelete ? t("fanCurve.confirmDelete") : t("fanCurve.delete")}
                 </ButtonItem>
               </div>
             </PanelSectionRow>
           </>
         ) : (
           <div className="afc-note">
-            {t("No curves are eligible for deletion -- only a curve with no factory default that isn't assigned to a profile on the Power tab can be removed.")}
+            {t("fanCurve.deleteUnavailableDescription")}
           </div>
         )}
       </PanelSection>
@@ -290,37 +290,37 @@ export function FanCurveGraphEditor({ state, setState, selected, onSelectedChang
 
   return (
     <>
-      <PanelSection title={t("EDIT CURVE")}>
+      <PanelSection title={t("fanCurve.edit")}>
         {names.length ? (
           <PseudoDropdown
-            label={t("Curve")}
+            label={t("fanCurve.curve")}
             value={curveName}
             options={names.map((name) => ({ data: name, label: translateLabel(state.fanCurves[name]?.label || titleCase(name)) }))}
             onChange={onSelectedChange}
           />
         ) : (
           <PanelSectionRow>
-            <Field label={t("No fan curves found")} />
+            <Field label={t("fanCurve.noneFound")} />
           </PanelSectionRow>
         )}
       </PanelSection>
       {curve ? (
-        <PanelSection title={t("POINTS")}>
+        <PanelSection title={t("fanCurve.points")}>
           <PanelSectionRow>
             <FanCurveGraph points={points} onChange={commitPoints} currentTemp={currentTemp} />
           </PanelSectionRow>
           <MinPwmWarningButton onFix={fixMinPwm} visible={belowMinPoint} />
           <div className="afc-note">
-            {t("Drag a point, or press A to steer it with the D-Pad. LB/RB switches points; B exits.")}
+            {t("fanCurve.editInstructions")}
           </div>
           {factoryCurve ? (
             <div className="afc-reset-row">
               <ButtonItem layout="below" onClick={resetCurve}>
-                {t("Reset Curve To Factory")}
+                {t("fanCurve.resetFactory")}
               </ButtonItem>
             </div>
           ) : null}
-          <div className="afc-note">{t("Nothing here is written to disk until you press Save Changes.")}</div>
+          <div className="afc-note">{t("fanCurve.unsavedDescription")}</div>
         </PanelSection>
       ) : null}
     </>
@@ -337,9 +337,9 @@ function MinPwmWarningButton({ onFix, visible }: { onFix: () => void; visible: b
           <ButtonItem
             layout="below"
             onClick={onFix}
-            description={t("Also adjustable via the Minimum Fan Speed slider in Fan Responsiveness.")}
+            description={t("fanCurve.minimumSpeedAdjustmentDescription")}
           >
-            {t("⚠ Below the Minimum Fan Speed floor -- tap to lower it to match")}
+            {t("fanCurve.belowMinimumWarning")}
           </ButtonItem>
         ) : null}
       </div>
@@ -405,40 +405,40 @@ function PointsPanel({
   };
 
   return (
-    <PanelSection title={t("POINTS")}>
+    <PanelSection title={t("fanCurve.points")}>
       <PanelSectionRow>
         <FanCurveGraph points={points} onChange={commitPoints} currentTemp={currentTemp} />
       </PanelSectionRow>
       <MinPwmWarningButton onFix={fixMinPwm} visible={belowMinPoint} />
       <div className="afc-note">
-        {t("Drag a point, or press A to steer it with the D-Pad. LB/RB switches points; B exits. Advanced editing uses raw {min}-{max} PWM.", {
+        {t("fanCurve.advancedEditInstructions", {
           min: CURVE_PWM_MIN,
           max: CURVE_PWM_MAX,
         })}
       </div>
       <ToggleEdit
-        label={t("Fan Stop")}
-        description={t("Fan off below the set temperature.")}
+        label={t("fanCurve.stop")}
+        description={t("fanCurve.stopDescription")}
         checked={fanStopEnabled}
         onChange={onToggleFanStop}
       />
       {fanStopEnabled ? (
         <>
           <NumberEdit
-            label={t("Stop Until (°C)")}
+            label={t("fanCurve.stopUntil")}
             value={fanStopTemp}
             rangeMin={CURVE_TEMP_MIN}
             rangeMax={CURVE_TEMP_MAX}
             onCommit={onFanStopTempChange}
           />
-          <div className="afc-note">{t("The 0% minimum applies globally while Fan Stop is enabled.")}</div>
+          <div className="afc-note">{t("fanCurve.stopMinimumDescription")}</div>
         </>
       ) : null}
       {onOpenFullscreen ? (
         <PanelSectionRow>
           <div className="afc-control-inset">
             <ButtonItem layout="below" onClick={onOpenFullscreen}>
-              {t("Fullscreen Editor")}
+              {t("fanCurve.fullscreenEditor")}
             </ButtonItem>
           </div>
         </PanelSectionRow>
@@ -446,7 +446,7 @@ function PointsPanel({
       <PanelSectionRow>
         <div className="afc-control-inset">
           <ButtonItem layout="below" onClick={onToggleShowPointEditor}>
-            {showPointEditor ? t("Hide Points") : t("Edit Curve Points")}
+            {showPointEditor ? t("fanCurve.hidePoints") : t("fanCurve.editPoints")}
           </ButtonItem>
         </div>
       </PanelSectionRow>
@@ -467,7 +467,7 @@ function PointsPanel({
           ))}
           <div className="afc-reset-row">
             <ButtonItem layout="below" onClick={addPoint}>
-              {t("Add Point")}
+              {t("fanCurve.addPoint")}
             </ButtonItem>
           </div>
         </div>
@@ -475,11 +475,11 @@ function PointsPanel({
       {factoryCurve ? (
         <div className="afc-reset-row">
           <ButtonItem layout="below" onClick={resetCurve}>
-            {t("Reset Curve To Factory")}
+            {t("fanCurve.resetFactory")}
           </ButtonItem>
         </div>
       ) : null}
-      <div className="afc-note">{t("Nothing here is written to disk until you press Save Changes.")}</div>
+      <div className="afc-note">{t("fanCurve.unsavedDescription")}</div>
     </PanelSection>
   );
 }
@@ -518,7 +518,7 @@ function PointRow({
       <AnimatedCollapse isOpen={isExpanded}>
         <div className="afc-point-details-inner">
           <NumberEdit
-            label={t("Temperature (°C)")}
+            label={t("fanCurve.temperature")}
             value={point.temp}
             rangeMin={CURVE_TEMP_MIN}
             rangeMax={CURVE_TEMP_MAX}

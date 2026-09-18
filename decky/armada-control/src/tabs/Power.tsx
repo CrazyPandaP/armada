@@ -51,28 +51,28 @@ export function Power({ config, setConfig }: { config: Config; setConfig: Dispat
   const supportsUnderclockPresets = !!config.power.underclocks?.[config.cpuDeviceClass];
   return (
     <>
-      <PanelSection title={t("EDIT POWER PROFILE")}>
+      <PanelSection title={t("power.editProfile")}>
         <SelectEdit value={profile} options={profiles} onChange={setProfile} />
       </PanelSection>
-      <PanelSection title={t("PROFILE SETTINGS")}>
-        <SelectEdit label={t("Fan Curve")} value={p.fan_curve} options={fanCurves} onChange={(v) => setProfileValue("fan_curve", v)} />
+      <PanelSection title={t("power.profileSettings")}>
+        <SelectEdit label={t("power.fanCurve")} value={p.fan_curve} options={fanCurves} onChange={(v) => setProfileValue("fan_curve", v)} />
         {(config.perf?.governors?.length ?? 0) > 0 ? (
           <SelectEdit
-            label={t("CPU Governor")}
+            label={t("power.cpuGovernor")}
             value={p.cpu_governor}
             options={config.perf!.governors.map((g) => ({ data: g, label: translateLabel(titleCase(g)) }))}
             onChange={(v) => setProfileValue("cpu_governor", v)}
           />
         ) : null}
         {supportsUnderclockPresets ? (
-          <SelectEdit label={t("CPU Underclock")} value={underclockLevel} options={underclocks.map((option) => ({ ...option, label: translateLabel(option.label) }))} onChange={(v) => setProfileValue("cpu_underclock", v)} />
+          <SelectEdit label={t("power.cpuUnderclock")} value={underclockLevel} options={underclocks.map((option) => ({ ...option, label: translateLabel(option.label) }))} onChange={(v) => setProfileValue("cpu_underclock", v)} />
         ) : (
-          <SliderEdit label={t("CPU Max (%)")} value={Math.round(Number(p.cpu_max || 0) * 100)} min={35} max={100} step={1} onChange={(v) => setProfileValue("cpu_max", (v / 100).toFixed(2))} />
+          <SliderEdit label={t("power.cpuMax")} value={Math.round(Number(p.cpu_max || 0) * 100)} min={35} max={100} step={1} onChange={(v) => setProfileValue("cpu_max", (v / 100).toFixed(2))} />
         )}
-        <SliderEdit label={t("GPU Min (%)")} value={Math.round(Number(p.gpu_min || 0) * 100)} min={0} max={100} step={1} onChange={(v) => setGpuValue("gpu_min", (v / 100).toFixed(2))} />
-        <SliderEdit label={t("GPU Max (%)")} value={Math.round(Number(p.gpu_max || 0) * 100)} min={35} max={100} step={1} onChange={(v) => setGpuValue("gpu_max", (v / 100).toFixed(2))} />
+        <SliderEdit label={t("power.gpuMin")} value={Math.round(Number(p.gpu_min || 0) * 100)} min={0} max={100} step={1} onChange={(v) => setGpuValue("gpu_min", (v / 100).toFixed(2))} />
+        <SliderEdit label={t("power.gpuMax")} value={Math.round(Number(p.gpu_max || 0) * 100)} min={35} max={100} step={1} onChange={(v) => setGpuValue("gpu_max", (v / 100).toFixed(2))} />
         <div className="armada-reset-row">
-          <ButtonItem layout="below" onClick={resetProfile}>{t("Reset to Default")}</ButtonItem>
+          <ButtonItem layout="below" onClick={resetProfile}>{t("common.resetToDefault")}</ButtonItem>
         </div>
       </PanelSection>
     </>

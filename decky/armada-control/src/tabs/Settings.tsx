@@ -88,7 +88,7 @@ export function Settings({ config, setConfig }: {
       setConfig((current) => (current ? { ...current, bottomScreenEnabled: applied } : current));
     } catch (error) {
       setConfig((current) => (current ? { ...current, bottomScreenEnabled: !enabled } : current));
-      toaster.toast({ title: t("Could not change bottom screen"), body: String(error) });
+      toaster.toast({ title: t("settings.bottomScreenError"), body: String(error) });
     }
   };
   const setBottomScreenBrightness = (brightness: number) => {
@@ -107,7 +107,7 @@ export function Settings({ config, setConfig }: {
           ...current,
           bottomScreenBrightness: appliedBottomScreenBrightness.current,
         } : current));
-        toaster.toast({ title: t("Could not change bottom-screen brightness"), body: String(error) });
+        toaster.toast({ title: t("settings.bottomScreenBrightnessError"), body: String(error) });
       }
     }, BOTTOM_SCREEN_BRIGHTNESS_DELAY_MS);
   };
@@ -119,7 +119,7 @@ export function Settings({ config, setConfig }: {
       setConfig((current: Config | null) => (current ? { ...current, desktopMode: applied } : current));
     } catch (error) {
       setConfig((current: Config | null) => (current ? { ...current, desktopMode: previous } : current));
-      toaster.toast({ title: t("Could not change desktop mode"), body: String(error) });
+      toaster.toast({ title: t("settings.desktopModeError"), body: String(error) });
     }
   }
   const setSleepMode = async (value: string) => {
@@ -130,43 +130,43 @@ export function Settings({ config, setConfig }: {
       setConfig((current) => (current ? { ...current, sleepMode: applied } : current));
     } catch (error) {
       setConfig((current) => (current ? { ...current, sleepMode: previous } : current));
-      toaster.toast({ title: t("Could not change sleep mode"), body: String(error) });
+      toaster.toast({ title: t("settings.sleepModeError"), body: String(error) });
     }
   };
   return (
     <>
-      <PanelSection title={t("Controller")}>
+      <PanelSection title={t("settings.controller")}>
         <SelectEdit
-          label={t("Emulation")}
+          label={t("settings.emulation")}
           value={config.controllerType || "deck-uhid"}
           options={(config.controllerTypes || []).map((option) => ({ ...option, label: translateLabel(option.label) }))}
           onChange={setControllerType}
         />
-        <ButtonItem layout="below" onClick={openCalibration}>{t("Launch Calibration")}</ButtonItem>
+        <ButtonItem layout="below" onClick={openCalibration}>{t("calibration.launch")}</ButtonItem>
       </PanelSection>
-      <PanelSection title={t("System")}>
+      <PanelSection title={t("settings.system")}>
         <SelectEdit
-          label={t("Sleep Mode")}
+          label={t("settings.sleepMode")}
           value={config.sleepMode || "s2idle"}
           options={(config.sleepModes || []).map((option) => ({ ...option, label: translateLabel(option.label) }))}
           onChange={setSleepMode}
         />
-        <ToggleRow label={t("Enable SSH")} value={!!config.sshEnabled} onChange={setSshEnabled} />
-        <Field label={t("OS Version")} description={config.osVersion || t("unknown")} />
-        <Field label={t("ABL Version")} description={config.ablVersion || t("unknown")} />
+        <ToggleRow label={t("settings.enableSsh")} value={!!config.sshEnabled} onChange={setSshEnabled} />
+        <Field label={t("settings.osVersion")} description={config.osVersion || t("common.unknown")} />
+        <Field label={t("settings.ablVersion")} description={config.ablVersion || t("common.unknown")} />
       </PanelSection>
-      <PanelSection title={t("Experimental")}>
+      <PanelSection title={t("settings.experimental")}>
         {config.bottomScreenSupported && (
           <>
             <ToggleRow
-              label={t("Bottom Screen")}
-              description={t("Run Plasma Mobile on the second display")}
+              label={t("settings.bottomScreen")}
+              description={t("settings.bottomScreenDescription")}
               value={!!config.bottomScreenEnabled}
               onChange={setBottomScreenEnabled}
             />
             {config.bottomScreenBrightnessSupported && (
               <SliderEdit
-                label={t("Bottom Screen Brightness")}
+                label={t("settings.bottomScreenBrightness")}
                 value={config.bottomScreenBrightness}
                 min={0}
                 max={100}
@@ -178,21 +178,21 @@ export function Settings({ config, setConfig }: {
         )}
         {(config.desktopModes?.length || 0) > 1 && (
           <SelectEdit
-            label={t("Desktop Mode")}
+            label={t("settings.desktopMode")}
             value={config.desktopMode || "desktop"}
             options={(config.desktopModes || []).map((option) => ({ ...option, label: translateLabel(option.label) }))}
             onChange={setDesktopMode}
           />
         )}
         <ToggleRow
-          label={t("USB File Transfer")}
-          description={config.mtpEnabled ? t("Enabled until shutdown") : undefined}
+          label={t("settings.usbFileTransfer")}
+          description={config.mtpEnabled ? t("settings.enabledUntilShutdown") : undefined}
           value={!!config.mtpEnabled}
           onChange={setMtpEnabled}
         />
         <ToggleRow
-          label={t("Automatic ABL Updates")}
-          description={t("Updates during shutdown")}
+          label={t("settings.automaticAblUpdates")}
+          description={t("settings.updatesDuringShutdown")}
           value={!!config.ablAutoEnabled}
           onChange={setAblAutoEnabled}
         />

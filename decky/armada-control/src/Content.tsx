@@ -80,7 +80,7 @@ export function Content() {
   }, [!!config]);
   useDebouncedSave({ config, field: "power", snapshot: savedPowerSnapshot, save: savePowerConfig, setConfig, onError: load });
   useDebouncedSave({ config, field: "tweaks", snapshot: savedTweaksSnapshot, save: saveTweaks, setConfig, onError: load });
-  if (!config) return <PanelSection title="Armada Control"><Field label={message === "Loading" ? t("Loading") : message} /></PanelSection>;
+  if (!config) return <PanelSection title="Armada Control"><Field label={message === "Loading" ? t("common.loading") : message} /></PanelSection>;
   const tabContent = (content: ReactNode) => (
     <div className="armada-control-tab-content">{content}</div>
   );

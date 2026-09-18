@@ -49,12 +49,12 @@ export function CreateCurveModal({
     <ModalRoot onCancel={() => closeModal?.()}>
       <style>{styles}</style>
       <DialogBody className="afc-scope">
-        <h2 className="afc-modal-title">{t("Create Curve")}</h2>
+        <h2 className="afc-modal-title">{t("fanCurve.create")}</h2>
         <PanelSectionRow>
           <div className="afc-control-inset">
             <Field
-              label={t("Curve Name")}
-              description={t("Letters, numbers, spaces, hyphens, and underscores are supported.")}
+              label={t("fanCurve.name")}
+              description={t("fanCurve.nameRequirements")}
               childrenLayout="below"
               childrenContainerWidth="max"
             >
@@ -63,10 +63,10 @@ export function CreateCurveModal({
           </div>
         </PanelSectionRow>
         {duplicateName ? (
-          <div className="afc-modal-error">{t("A curve named “{name}” already exists.", { name })}</div>
+          <div className="afc-modal-error">{t("fanCurve.nameExists", { name })}</div>
         ) : null}
         <PseudoDropdown
-          label={t("Base Curve")}
+          label={t("fanCurve.base")}
           value={baseCurve}
           options={names.map((curveName) => ({
             data: curveName,
@@ -75,13 +75,13 @@ export function CreateCurveModal({
           onChange={setBaseCurve}
         />
         <div className="afc-note">
-          {t("The new curve starts as a copy of the selected base curve. Changes remain unsaved until Save Changes is pressed.")}
+          {t("fanCurve.createDescription")}
         </div>
       </DialogBody>
       <DialogFooter>
-        <DialogButton onClick={() => closeModal?.()}>{t("Cancel")}</DialogButton>
+        <DialogButton onClick={() => closeModal?.()}>{t("common.cancel")}</DialogButton>
         <DialogButton onClick={createCurve} disabled={!canCreate}>
-          {t("Create Curve")}
+          {t("fanCurve.create")}
         </DialogButton>
       </DialogFooter>
     </ModalRoot>

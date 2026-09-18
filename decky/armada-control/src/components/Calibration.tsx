@@ -158,19 +158,19 @@ function CalibrationModal({ closeModal }: { closeModal?: () => void }) {
   };
 
   const instructions = !state
-    ? t("Checking controller...")
+    ? t("calibration.checking")
     : !canApply
-      ? t("This device can't save calibration, but you can check stick and trigger response here.")
+      ? t("calibration.readOnlyDescription")
       : phase === "recording"
-        ? t("Move both sticks in full circles and fully press both triggers, then Save.")
-        : t("Press Start, then move sticks and triggers through full range.");
+        ? t("calibration.captureDescription")
+        : t("calibration.startDescription");
 
   return (
     <ModalRoot onCancel={close}>
       <DialogBody>
         <div style={{ ...gridTwoCol, alignItems: "start", marginBottom: "22px" }}>
-          <StickPlot title={t("Left Stick")} xName="left_x" yName="left_y" state={state} />
-          <StickPlot title={t("Right Stick")} xName="right_x" yName="right_y" state={state} />
+          <StickPlot title={t("calibration.leftStick")} xName="left_x" yName="left_y" state={state} />
+          <StickPlot title={t("calibration.rightStick")} xName="right_x" yName="right_y" state={state} />
         </div>
         <div style={{ ...gridTwoCol, marginBottom: "16px" }}>
           <TriggerBar title="LT" name="left_trigger" state={state} />
@@ -182,18 +182,18 @@ function CalibrationModal({ closeModal }: { closeModal?: () => void }) {
         <style>{focusStyles}</style>
         {!canApply ? (
           <div className="armada-cal-footer" style={{ display: "flex", gap: "10px" }}>
-            <DialogButton onClick={close}>{t("Close")}</DialogButton>
+            <DialogButton onClick={close}>{t("common.close")}</DialogButton>
           </div>
         ) : phase === "recording" ? (
           <div className="armada-cal-footer" style={{ display: "flex", gap: "10px" }}>
-            <DialogButton onClick={save} disabled={!capture}>{t("Save Calibration")}</DialogButton>
-            <DialogButton onClick={close}>{t("Close")}</DialogButton>
+            <DialogButton onClick={save} disabled={!capture}>{t("calibration.save")}</DialogButton>
+            <DialogButton onClick={close}>{t("common.close")}</DialogButton>
           </div>
         ) : (
           <div className="armada-cal-footer" style={{ display: "flex", gap: "10px" }}>
-            <DialogButton onClick={start}>{t("Start Calibration")}</DialogButton>
-            <DialogButton onClick={reset}>{t("Reset to Defaults")}</DialogButton>
-            <DialogButton onClick={close}>{t("Close")}</DialogButton>
+            <DialogButton onClick={start}>{t("calibration.start")}</DialogButton>
+            <DialogButton onClick={reset}>{t("calibration.resetDefaults")}</DialogButton>
+            <DialogButton onClick={close}>{t("common.close")}</DialogButton>
           </div>
         )}
       </DialogFooter>

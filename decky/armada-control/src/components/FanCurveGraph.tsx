@@ -192,8 +192,8 @@ export function FanCurveGraph({ points, onChange, currentTemp }: {
       onButtonDown={controllerActive ? handleGraphButtonDown : undefined}
       onGamepadDirection={controllerActive ? handleGraphDirection : undefined}
       onGamepadBlur={controllerActive ? exitControllerMode : undefined}
-      onOKActionDescription={controllerActive ? undefined : t("Edit Point")}
-      onCancelActionDescription={controllerActive ? t("Stop Editing") : undefined}
+      onOKActionDescription={controllerActive ? undefined : t("fanCurve.editPoint")}
+      onCancelActionDescription={controllerActive ? t("fanCurve.stopEditing") : undefined}
     >
       <svg
         ref={svgRef}
@@ -206,7 +206,7 @@ export function FanCurveGraph({ points, onChange, currentTemp }: {
           <rect x={PAD_LEFT} y={PAD_TOP} width={Math.max(0, fanStopX - PAD_LEFT)} height={PLOT_H} fill="rgba(255,209,102,0.14)" />
           <line x1={fanStopX} x2={fanStopX} y1={PAD_TOP} y2={PAD_TOP + PLOT_H} stroke="rgba(255,209,102,0.55)" strokeDasharray="2,2" />
           <text x={PAD_LEFT + 2} y={PAD_TOP + 9} fontSize="7" textAnchor="start" fill="rgba(255,209,102,0.85)">
-            {t("FAN STOPPED")}
+            {t("fanCurve.stopped")}
           </text>
         </g>
       ) : null}
@@ -289,7 +289,7 @@ export function FanCurveGraph({ points, onChange, currentTemp }: {
       </svg>
       {controllerActive ? (
         <div className="afc-controller-hint">
-          {t("D-Pad moves point {current} of {total} · LB/RB switches points · B stops", {
+          {t("fanCurve.controllerEditStatus", {
             current: clamp(controllerIndex, 0, points.length - 1) + 1,
             total: points.length,
           })}

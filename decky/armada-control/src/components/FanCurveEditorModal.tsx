@@ -74,18 +74,18 @@ export function FanCurveEditorModal({
             onClick={handleSave}
             disabled={!dirty || saving}
           >
-            {saving ? t("Saving...") : t("Save Changes")}
+            {saving ? t("common.saving") : t("common.saveChanges")}
           </DialogButton>
           <DialogButton
             className="afc-modal-footer-half"
             onClick={handleRevert}
             disabled={!dirty || saving}
           >
-            {t("Revert Changes")}
+            {t("common.revertChanges")}
           </DialogButton>
         </div>
         <DialogButton className="afc-modal-footer-full" onClick={() => closeModal?.()}>
-          {t("Close")}
+          {t("common.close")}
         </DialogButton>
       </DialogFooter>
     </ModalRoot>

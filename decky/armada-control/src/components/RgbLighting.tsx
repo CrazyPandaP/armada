@@ -57,7 +57,7 @@ export function RgbLighting() {
       savedConfig.current = JSON.stringify(next);
       setConfig(next);
     } catch (error) {
-      toaster.toast({ title: t("Could not load RGB lighting"), body: String(error) });
+      toaster.toast({ title: t("rgb.loadError"), body: String(error) });
     }
   }, []);
 
@@ -78,7 +78,7 @@ export function RgbLighting() {
         await setRgb(config.enabled, config.color, config.brightness);
         savedConfig.current = current;
       } catch (error) {
-        toaster.toast({ title: t("Could not change RGB lighting"), body: String(error) });
+        toaster.toast({ title: t("rgb.changeError"), body: String(error) });
         load();
       }
     }, delay);
@@ -89,14 +89,14 @@ export function RgbLighting() {
   if (!config) return null;
 
   return (
-    <PanelSection title={t("RGB Lighting")}>
+    <PanelSection title={t("rgb.title")}>
       <ToggleRow
-        label={t("Enabled")}
+        label={t("common.enabled")}
         value={config.enabled}
         onChange={(enabled: boolean) => setConfig({ ...config, enabled })}
       />
       <SliderEdit
-        label={t("Brightness")}
+        label={t("common.brightness")}
         value={config.brightness}
         min={0}
         max={100}
@@ -105,7 +105,7 @@ export function RgbLighting() {
         onChange={(brightness: number) => setConfig({ ...config, brightness })}
       />
       <SliderEdit
-        label={t("Color")}
+        label={t("common.color")}
         value={colorHue(config.color)}
         min={0}
         max={359}
