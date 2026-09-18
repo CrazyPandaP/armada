@@ -98,6 +98,9 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
   source: https://github.com/armada-os/armada/issues/327
   upstream: unknown
   notes: Adds support for Visionox VTDR6130 panel revisions found in the Retroid Pocket Flip 2, derived from the affected device's live Android device tree. Reuses the Pocket 6 initialization sequence and DSC configuration with the Flip 2 regulator supplies.
+- `patches/0064_Mangmi-Air-Y-Pro-panel.patch`
+  source: https://github.com/ROCKNIX/distribution/blob/807c74fc46c124891d8aa9b57a68533d38e9a6b2/projects/ROCKNIX/devices/SM8250/patches/linux/0064_Mangmi-Air-Y-Pro-panel.patch
+  upstream: unknown
 - `patches/0058_AYN-Odin2-Mini--backlight.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8550/patches/linux/0058_AYN-Odin2-Mini--backlight.patch
   upstream: unknown
@@ -126,6 +129,9 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
 - `patches/0065-backlight-aw99706-use-dt-binding-property-names.patch`
   source: https://github.com/mrdidit/distribution/blob/b14788a72b7399f03aad2cdcced2e3b91ae15810/projects/ROCKNIX/devices/SM8750/patches/linux/0065-backlight-aw99706-use-dt-binding-property-names.patch
   upstream: unknown
+- `patches/0066-regulator-add-qcom-pm8150l-lcdb.patch`
+  source: https://github.com/ROCKNIX/distribution/blob/807c74fc46c124891d8aa9b57a68533d38e9a6b2/projects/ROCKNIX/devices/SM8250/patches/linux/0066-regulator-add-qcom-pm8150l-lcdb.patch
+  upstream: unknown
 - `patches/0015-touchscreen-edt-ft5x06-allow-to-override-input-name.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8250/patches/linux/0015-touchscreen-edt-ft5x06-allow-to-override-input-name.patch
   upstream: https://lore.kernel.org/r/20260409-ft5x06-label-v1-1-21e8a9ae9a60@gmail.com
@@ -147,6 +153,9 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
   source: armada
   upstream: local
   notes: Armada added this follow-up to preserve the vendor driver's pinctrl, GPIO-direction, power, and reset ordering after the GPIO-descriptor port.
+- `patches/0065-input-touchscreen-add-hynitron-cst66xx.patch`
+  source: https://github.com/ROCKNIX/distribution/blob/807c74fc46c124891d8aa9b57a68533d38e9a6b2/projects/ROCKNIX/devices/SM8250/patches/linux/0065-input-touchscreen-add-hynitron-cst66xx.patch
+  upstream: unknown
 - `patches/0054-input-goodix-override-resolution-from-dt.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8550/patches/linux/0054-input-goodix-override-resolution-from-dt.patch
   upstream: unknown
@@ -178,6 +187,9 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
   source: https://github.com/ROCKNIX/distribution/blob/024028b4f3fdd139ae1e575efb25914b8f76595d/projects/ROCKNIX/devices/SM8750/patches/linux/0069-input-misc-add-konkr-sysbtn-MCU-system-buttons.patch
   upstream: unknown
   notes: Updated to ROCKNIX #3089, which adds the MCU-rendered stick lighting effects (sysfs "effect": static/breath/rainbow) and fixes the PM notifier to replay the active lighting mode after resume instead of only the last static colour.
+- `patches/0060_Mangmi-Pocket-Max-SPI-joypad.patch`
+  source: https://github.com/ROCKNIX/distribution/blob/807c74fc46c124891d8aa9b57a68533d38e9a6b2/projects/ROCKNIX/devices/SM8250/patches/linux/0060_Mangmi-Pocket-Max-SPI-joypad.patch
+  upstream: unknown
 - `patches/0031_input--Add-driver-for-RSInput-Gamepad.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8550/patches/linux/0031_input--Add-driver-for-RSInput-Gamepad.patch
   upstream: unknown
@@ -249,6 +261,9 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
   upstream: unknown
 - `patches/0030-leds-Add-driver-for-HEROIC-HTR3212.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8750/patches/linux/0030-leds-Add-driver-for-HEROIC-HTR3212.patch
+  upstream: unknown
+- `patches/0061_leds-aw200xx-vdd-supply.patch`
+  source: https://github.com/ROCKNIX/distribution/blob/807c74fc46c124891d8aa9b57a68533d38e9a6b2/projects/ROCKNIX/devices/SM8250/patches/linux/0061_leds-aw200xx-vdd-supply.patch
   upstream: unknown
 - `patches/0054_sn3112-pwm-driver.patch`
   source: https://github.com/ROCKNIX/distribution/blob/4609c5017f350e6e2307ec909e328454d5bec062/projects/ROCKNIX/devices/SM8550/patches/linux/0054_sn3112-pwm-driver.patch
@@ -373,6 +388,9 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8250/patches/linux/0014-fix-wifi-and-bt-mac.patch
   upstream: unknown
   notes: Armada carries only the ath11k portion of the shared ROCKNIX patch; the Bluetooth and SoC-serial changes are supplied by `0501-ROCKNIX-fix-wifi-and-bt-mac.patch`.
+- `patches/0067-arm64-dts-qcom-pm8150l-add-lcdb-node.patch`
+  source: https://github.com/ROCKNIX/distribution/blob/063e530e58d380aa17a7c608f0853898cc3911a5/projects/ROCKNIX/devices/SM8250/patches/linux/0067-arm64-dts-qcom-pm8150l-add-lcdb-node.patch
+  upstream: unknown
 - `patches/0004-pm8150b.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8250/patches/linux/0004-pm8150b.patch
   upstream: unknown
@@ -385,6 +403,9 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
   upstream: unknown
 - `patches/0013-add-force-feedback.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8250/patches/linux/0013-add-force-feedback.patch
+  upstream: unknown
+- `patches/0063_Mangmi-Pocket-Max-HL7139-charge-pump.patch`
+  source: https://github.com/ROCKNIX/distribution/blob/807c74fc46c124891d8aa9b57a68533d38e9a6b2/projects/ROCKNIX/devices/SM8250/patches/linux/0063_Mangmi-Pocket-Max-HL7139-charge-pump.patch
   upstream: unknown
 - `patches/0011-qcom-pm8150b-charger.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8250/patches/linux/0011-qcom-pm8150b-charger.patch
@@ -562,6 +583,9 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
 - `dts/sm8250-ayn-thorlite.dts.patch`
   source: armada
   notes: Armada removes the kernel touchscreen coordinate transforms after copying `dts/sm8250-ayn-thorlite.dts`; Gamescope/libinput maps the native digitizer coordinates to the rotated outputs, and applying both transforms makes the right edge behave as the top edge. This matches Armada's full Thor handling.
+- `dts/sm8250-mangmi-air-y-pro.dts`
+  source: https://github.com/ROCKNIX/distribution/blob/807c74fc46c124891d8aa9b57a68533d38e9a6b2/projects/ROCKNIX/devices/SM8250/linux/dts/qcom/sm8250-mangmi-air-y-pro.dts
+  notes: Imported verbatim from ROCKNIX; SHA-256 `d98f1104f4fe29f9bf8c94692beb491e840332a851f1f6994f015973ba24c018`.
 - `dts/sm8250-retroidpocket-flip2.dts`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8250/linux/dts/qcom/sm8250-retroidpocket-flip2.dts
 - `dts/sm8250-retroidpocket-flip2-visionox.dts`
