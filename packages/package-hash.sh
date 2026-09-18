@@ -18,14 +18,30 @@ if grep -q '/src/TERRA.env' "${pkg}/build.sh" 2>/dev/null; then
 fi
 
 # Exclusions for local builds
-{
+prune=(-not -path "*/out/*" -not -path "*/.ccache/*"
+       -not -path "*/work/*" -not -path "*/target/*")
+
+list_files() {
     for p in "${paths[@]}"; do
         if [ -d "$p" ]; then
-            find "$p" -type f \
-                -not -path "*/out/*" -not -path "*/.ccache/*" \
-                -not -path "*/work/*" -not -path "*/target/*" -print0
+            find "$p" -type f "${prune[@]}" -print0
         else
             printf '%s\0' "$p"
         fi
-    done
-} | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum | cut -c1-32
+    done | LC_ALL=C sort -z
+}
+
+list_links() {
+    for p in "${paths[@]}"; do
+        if [ -d "$p" ]; then
+            find "$p" -type l "${prune[@]}" -printf '%p -> %l\0'
+        fi
+    done | LC_ALL=C sort -z
+}
+
+# Modes and symlink targets too, so a permission or link fix rebuilds.
+{
+    list_files | xargs -0 sha256sum
+    list_files | xargs -0 stat -c '%a %n'
+    list_links
+} | sha256sum | cut -c1-32
