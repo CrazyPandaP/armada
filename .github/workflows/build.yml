@@ -332,7 +332,8 @@ jobs:
     needs: build_push
     if: >-
       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging') &&
-      needs.build_push.outputs.channel != ''
+      needs.build_push.outputs.channel != '' &&
+      github.event.repository.fork == false
     permissions:
       contents: read
       packages: read
