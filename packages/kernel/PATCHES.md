@@ -297,6 +297,9 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
   source: armada
   upstream: not submitted
   notes: On OPP-scaling platforms the OPP carries the only PCIe memory-path votes, so dropping it to NULL on non-S2RAM suspend leaves the RPMh sleep set with no DDR/LLCC contract and the AOP never resumes. Deliberately does not populate `pcie->icc_mem` on OPP platforms: `qcom_pcie_icc_opp_update()` prefers an `icc_mem` handle over the OPP branch, so providing one silently disables the post-link-training OPP update and pins the OPP at the probe-time maximum.
+- `patches/0514-PCI-qcom-honor-iommu-map-cell-count.patch`
+  source: https://lkml.iu.edu/2609.0/16096.html
+  upstream: https://lore.kernel.org/r/20260907143349.317495-1-mani@kernel.org
 - `patches/0001-pcie-update-sm8550-dtsi.patch`
   source: https://github.com/ROCKNIX/distribution/blob/bcf3b5bc574990b96543484575b06f912153a715/projects/ROCKNIX/devices/SM8550/patches/linux/0001-pcie-update-sm8550-dtsi.patch
   upstream: https://lore.kernel.org/r/20260611-wake-v2-33-2744251b1181@oss.qualcomm.com
