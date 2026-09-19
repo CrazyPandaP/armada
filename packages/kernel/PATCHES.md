@@ -635,3 +635,8 @@ no equivalent submission was found, or a permanent URL to the upstream submissio
 - `dts/sm8650-konkr-pf.dts.patch`
   source: armada
   notes: Armada selects the shared WSA2 channel mapping through a Pocket FIT-specific sound-card compatible.
+
+- `patches/0505-arm64-emulate-unaligned-atomics.patch`
+  source: https://github.com/bylaws/linux/commit/7ae989a43ae7e3cb8007ac21c28dacc24c9d8320
+  upstream: unknown
+  notes: Rebased patch context for Linux 7.2.3 and Armada's compat-input patch; the unaligned-atomic handler is unchanged.
