@@ -352,6 +352,7 @@ mangmi = run_device_env("MANGMI Air Y Pro")
 check("device-env MANGMI profile",
       mangmi.get("ARMADA_DEVICE_ID") == "mangmi-air-y-pro" and
       mangmi.get("ARMADA_SOC_CLASS") == "SM8250" and
+      mangmi.get("ARMADA_GAMESCOPE_FAKE_OUTPUT_MM") == "120x90" and
       mangmi.get("ARMADA_IP_TARGETS") == "ds5")
 
 # --- armada-powerd: config parsing ------------------------------------------
