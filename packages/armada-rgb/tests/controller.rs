@@ -215,6 +215,48 @@ fn cli_supports_channel_backend() {
 }
 
 #[test]
+fn air_y_pro_profile_controls_both_aw20036_rings() {
+    let fixture: Fixture = Fixture::new();
+    fs::write(&fixture.model, b"MANGMI Air Y Pro\0").unwrap();
+    fs::write(&fixture.profiles, include_bytes!("../profiles.json")).unwrap();
+
+    for index in 0..16 {
+        for color in ["red", "green", "blue"] {
+            fixture.channel_target(&format!("{color}:indicator-{index}"), "255");
+        }
+    }
+
+    let output: std::process::Output = Command::new(env!("CARGO_BIN_EXE_armada-rgb"))
+        .env("ARMADA_RGB_CONFIG_PATH", &fixture.config)
+        .env("ARMADA_RGB_SYSFS_ROOT", &fixture.leds)
+        .env("ARMADA_RGB_MODEL_PATH", &fixture.model)
+        .env("ARMADA_RGB_PROFILES_PATH", &fixture.profiles)
+        .args(["set", "--color", "FF8000", "--brightness", "25"])
+        .output()
+        .unwrap();
+
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    for index in 0..16 {
+        assert_eq!(
+            fixture.value(&format!("red:indicator-{index}"), "brightness"),
+            "64"
+        );
+        assert_eq!(
+            fixture.value(&format!("green:indicator-{index}"), "brightness"),
+            "14"
+        );
+        assert_eq!(
+            fixture.value(&format!("blue:indicator-{index}"), "brightness"),
+            "0"
+        );
+    }
+}
+
+#[test]
 fn correction_preserves_the_user_color() {
     let fixture: Fixture = Fixture::new();
     fixture.target("rgb:sticks", "red green blue", "255");
