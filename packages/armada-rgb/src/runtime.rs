@@ -131,6 +131,7 @@ mod tests {
             "AYN Thor Lite",
             "AYN Odin 3",
             "KONKR Pocket FIT Elite",
+            "MANGMI Air Y Pro",
             "Retroid Pocket 5",
             "Retroid Pocket 5 Visionox",
             "Retroid Pocket Flip2",
