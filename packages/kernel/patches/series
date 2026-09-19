@@ -6,6 +6,7 @@
 0004-drm-msm-a6xx-Enable-IFPC-on-Adreno-740.patch
 0010-msm-resource-cleanup.patch
 0048-drm-msm-dsi-reparent-byte-pixel-src-to-xo-on-disable.patch
+0048a-drm-msm-dsi-round-byte-clock-rate-after-reparenting-to-PLL.patch
 0049-drm-msm-dpu-panel-opt-in-8bpc-dither.patch
 0066-drm-msm-dpu-enable-inline-rotation.patch
 0068-drm-msm-dpu-lutdma-dspp-igc-gamut.patch
@@ -104,6 +105,7 @@ v9_20260729_qualcomm_crypto_qce_runtime_pm_interconnect.patch
 0512-PCI-qcom-skip-L23-ready-poll-on-SM8550.patch
 0513-PCI-qcom-honour-an-opp-suspend-opp-as-the-non-s2ram-memory-floor.patch
 0514-PCI-qcom-honor-iommu-map-cell-count.patch
+0514a-of-property-honor-iommu-cells-in-iommu-map-devlinks.patch
 
 # ============== SM8550 DTSI prerequisites ==============
 0001-pcie-update-sm8550-dtsi.patch
