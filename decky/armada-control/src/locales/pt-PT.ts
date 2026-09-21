@@ -57,6 +57,8 @@ export const ptPT = {
   "common.unknown": "desconhecido",
   "settings.experimental": "Experimental",
   "settings.sleepMode": "Modo de suspensão",
+  "settings.sleepLogs": "Ativar registos de suspensão",
+  "settings.sleepLogsError": "Não foi possível atualizar os registos de suspensão",
   "settings.bottomScreen": "Ecrã inferior",
   "settings.bottomScreenDescription": "Inicia o Plasma Mobile no ecrã inferior",
   "settings.bottomScreenBrightness": "Brilho do ecrã inferior",

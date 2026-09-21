@@ -57,6 +57,8 @@ export const ptBR = {
   "common.unknown": "desconhecido",
   "settings.experimental": "Experimental",
   "settings.sleepMode": "Modo de descanso",
+  "settings.sleepLogs": "Ativar logs de suspensão",
+  "settings.sleepLogsError": "Não foi possível atualizar os logs de suspensão",
   "settings.bottomScreen": "Tela inferior",
   "settings.bottomScreenDescription": "Inicia o Plasma Mobile na tela inferior",
   "settings.bottomScreenBrightness": "Brilho da tela inferior",

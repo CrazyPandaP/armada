@@ -55,6 +55,8 @@ export const en = {
   "common.unknown": "unknown",
   "settings.experimental": "Experimental",
   "settings.sleepMode": "Sleep Mode",
+  "settings.sleepLogs": "Enable sleep logs",
+  "settings.sleepLogsError": "Could not update sleep logs",
   "settings.bottomScreen": "Bottom Screen",
   "settings.bottomScreenDescription": "Run Plasma Mobile on the second display",
   "settings.bottomScreenBrightness": "Bottom Screen Brightness",

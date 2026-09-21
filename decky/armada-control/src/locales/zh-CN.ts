@@ -57,6 +57,8 @@ export const zhCN = {
   "common.unknown": "未知",
   "settings.experimental": "实验性功能",
   "settings.sleepMode": "休眠模式",
+  "settings.sleepLogs": "启用休眠日志",
+  "settings.sleepLogsError": "无法更新休眠日志设置",
   "settings.bottomScreen": "下屏",
   "settings.bottomScreenDescription": "在第二块屏幕上运行 Plasma 移动版",
   "settings.bottomScreenBrightness": "下屏亮度",
