@@ -28,7 +28,7 @@ fi
 
 events=()
 for event in /sys/class/input/event*; do
-    if ! udevadm info --query=property --path="$event" 2>/dev/null | grep -qx 'ARMADA_WAYDROID_GAMEPAD=1'; then
+    if ! udevadm info --query=property --path="$event" 2>/dev/null | grep -qx 'INPUTPLUMBER_SHARED_GAMEPAD=1'; then
         continue
     fi
     events+=("$event")
