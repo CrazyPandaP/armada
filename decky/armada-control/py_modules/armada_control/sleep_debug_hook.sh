@@ -3,7 +3,13 @@ set -uo pipefail
 
 if [[ "${1:-}" == collect-report ]]; then
     set -e
-    report_dir=/var/home/armada
+    documents_dir=/var/home/armada/Documents
+    report_dir=$documents_dir/sleep-logs
+    if [[ ! -d "$documents_dir" ]]; then
+        install -d -o armada -g armada -m 0755 "$documents_dir"
+    fi
+    mkdir -p -- "$report_dir"
+    chown armada:armada "$report_dir"
     timestamp=$(date +%Y%m%d-%H%M%S)
     report=$(mktemp "$report_dir/.armada-sleep-debug-auto.XXXXXX")
     if ! /usr/bin/armada-sleep-debug collect >"$report"; then
