@@ -56,6 +56,7 @@ export const ptBR = {
   "settings.ablVersion": "Versão do ABL",
   "common.unknown": "desconhecido",
   "settings.experimental": "Experimental",
+  "settings.diagnostics": "Diagnósticos",
   "settings.sleepMode": "Modo de descanso",
   "settings.sleepLogs": "Ativar logs de suspensão",
   "settings.sleepLogsError": "Não foi possível atualizar os logs de suspensão",

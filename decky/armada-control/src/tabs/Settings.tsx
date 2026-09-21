@@ -200,12 +200,6 @@ export function Settings({ config, setConfig }: {
           options={(config.sleepModes || []).map((option) => ({ ...option, label: translateLabel(option.label) }))}
           onChange={setSleepMode}
         />
-        <ToggleRow
-          label={t("settings.sleepLogs")}
-          value={sleepLogsEnabled ?? false}
-          disabled={sleepLogsEnabled === null || sleepLogsSaving}
-          onChange={(enabled) => { void setSleepLogs(enabled); }}
-        />
         <ToggleRow label={t("settings.enableSsh")} value={!!config.sshEnabled} onChange={setSshEnabled} />
         <Field label={t("settings.osVersion")} description={config.osVersion || t("common.unknown")} />
         <Field label={t("settings.ablVersion")} description={config.ablVersion || t("common.unknown")} />
@@ -250,6 +244,14 @@ export function Settings({ config, setConfig }: {
           description={t("settings.updatesDuringShutdown")}
           value={!!config.ablAutoEnabled}
           onChange={setAblAutoEnabled}
+        />
+      </PanelSection>
+      <PanelSection title={t("settings.diagnostics")}>
+        <ToggleRow
+          label={t("settings.sleepLogs")}
+          value={sleepLogsEnabled ?? false}
+          disabled={sleepLogsEnabled === null || sleepLogsSaving}
+          onChange={(enabled) => { void setSleepLogs(enabled); }}
         />
       </PanelSection>
     </>
